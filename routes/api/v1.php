@@ -1,7 +1,8 @@
 <?php
 
+use App\Modules\Auth\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
-    // Seluruh route /api/v1/... didaftarkan di sini (Dok 07 API Design).
+    Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
 });
