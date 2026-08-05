@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,6 +17,7 @@ class Pengguna extends Authenticatable
     protected $table = 'pengguna';
 
     protected $fillable = [
+        'sekolah_id',
         'nama',
         'email',
         'password',
@@ -35,5 +37,10 @@ class Pengguna extends Authenticatable
             'status_aktif' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function sekolah(): BelongsTo
+    {
+        return $this->belongsTo(Sekolah::class);
     }
 }
