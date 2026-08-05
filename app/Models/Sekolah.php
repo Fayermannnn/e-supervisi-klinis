@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sekolah extends Model
@@ -25,5 +26,10 @@ class Sekolah extends Model
         return [
             'status_aktif' => 'boolean',
         ];
+    }
+
+    public function pengguna(): HasMany
+    {
+        return $this->hasMany(Pengguna::class);
     }
 }

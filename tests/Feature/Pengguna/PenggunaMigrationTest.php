@@ -3,6 +3,7 @@
 namespace Tests\Feature\Pengguna;
 
 use App\Models\Pengguna;
+use App\Models\Sekolah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -15,6 +16,7 @@ class PenggunaMigrationTest extends TestCase
     {
         $this->assertTrue(Schema::hasColumns('pengguna', [
             'id',
+            'sekolah_id',
             'nama',
             'email',
             'password',
@@ -26,6 +28,31 @@ class PenggunaMigrationTest extends TestCase
             'updated_at',
             'deleted_at',
         ]));
+    }
+
+    public function test_pengguna_can_be_created_without_sekolah(): void
+    {
+        $pengguna = Pengguna::factory()->create();
+
+        $this->assertNull($pengguna->sekolah_id);
+    }
+
+    public function test_pengguna_belongs_to_sekolah(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+        $pengguna = Pengguna::factory()->create(['sekolah_id' => $sekolah->id]);
+
+        $this->assertTrue($pengguna->sekolah->is($sekolah));
+    }
+
+    public function test_sekolah_id_is_set_null_when_sekolah_is_hard_deleted(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+        $pengguna = Pengguna::factory()->create(['sekolah_id' => $sekolah->id]);
+
+        $sekolah->forceDelete();
+
+        $this->assertNull($pengguna->fresh()->sekolah_id);
     }
 
     public function test_pengguna_can_be_created_with_uuid_primary_key(): void
