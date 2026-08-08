@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\SetupTwoFactor;
 use App\Livewire\Pengguna\Create as PenggunaCreate;
 use App\Livewire\Pengguna\Edit as PenggunaEdit;
 use App\Livewire\Pengguna\Index as PenggunaIndex;
@@ -19,6 +20,8 @@ Route::get('/login', Login::class)->middleware('guest')->name('login');
 Route::get('/beranda', function () {
     return view('beranda');
 })->middleware('auth')->name('beranda');
+
+Route::get('/2fa/aktivasi', SetupTwoFactor::class)->middleware('auth')->name('two-factor.setup');
 
 Route::post('/logout', function () {
     Auth::guard('web')->logout();

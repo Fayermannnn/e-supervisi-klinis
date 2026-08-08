@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Http\Middleware\EnsureTwoFactorIsConfigured;
 use App\Http\Middleware\RequirePermission;
 use App\Support\ApiResponse;
 use Illuminate\Foundation\Application;
@@ -20,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'permission' => RequirePermission::class,
         ]);
+
+        $middleware->appendToGroup('web', EnsureTwoFactorIsConfigured::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ApiException $e) {
