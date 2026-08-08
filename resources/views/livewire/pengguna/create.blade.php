@@ -31,13 +31,18 @@
 
         <div>
             <label for="sekolah_id" class="block text-sm font-medium text-slate-700">Sekolah</label>
-            <select id="sekolah_id" wire:model="sekolah_id"
-                class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
-                <option value="">- Tanpa Sekolah -</option>
-                @foreach ($daftarSekolah as $item)
-                    <option value="{{ $item->id }}">{{ $item->nama_sekolah }}</option>
-                @endforeach
-            </select>
+            @if ($sekolahTerkunci)
+                <input type="text" value="{{ $daftarSekolah->firstWhere('id', $sekolah_id)?->nama_sekolah }}" disabled
+                    class="mt-1 block w-full rounded-md border-slate-300 bg-slate-50 text-slate-500 shadow-sm">
+            @else
+                <select id="sekolah_id" wire:model="sekolah_id"
+                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                    <option value="">- Tanpa Sekolah -</option>
+                    @foreach ($daftarSekolah as $item)
+                        <option value="{{ $item->id }}">{{ $item->nama_sekolah }}</option>
+                    @endforeach
+                </select>
+            @endif
             @error('sekolah_id')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
             @enderror

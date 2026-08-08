@@ -28,11 +28,13 @@ Route::post('/logout', function () {
     return redirect()->route('login');
 })->middleware('auth')->name('logout');
 
-Route::middleware('auth')->name('app.')->group(function () {
+Route::middleware(['auth', 'permission:sekolah.manage'])->name('app.')->group(function () {
     Route::get('/sekolah', SekolahIndex::class)->name('sekolah.index');
     Route::get('/sekolah/tambah', SekolahCreate::class)->name('sekolah.create');
     Route::get('/sekolah/{sekolah}/ubah', SekolahEdit::class)->name('sekolah.edit');
+});
 
+Route::middleware(['auth', 'permission:pengguna.manage'])->name('app.')->group(function () {
     Route::get('/pengguna', PenggunaIndex::class)->name('pengguna.index');
     Route::get('/pengguna/tambah', PenggunaCreate::class)->name('pengguna.create');
     Route::get('/pengguna/{pengguna}/ubah', PenggunaEdit::class)->name('pengguna.edit');

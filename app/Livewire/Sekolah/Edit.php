@@ -25,6 +25,8 @@ class Edit extends Component
 
     public function mount(Sekolah $sekolah): void
     {
+        $this->authorize('update', $sekolah);
+
         $this->sekolah = $sekolah;
         $this->nama_sekolah = $sekolah->nama_sekolah;
         $this->npsn = $sekolah->npsn;

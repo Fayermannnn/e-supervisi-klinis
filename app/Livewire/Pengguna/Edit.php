@@ -30,8 +30,12 @@ class Edit extends Component
 
     public bool $status_aktif = true;
 
+    public bool $sekolahTerkunci = false;
+
     public function mount(Pengguna $pengguna): void
     {
+        $this->authorize('update', $pengguna);
+
         $this->pengguna = $pengguna;
         $this->sekolah_id = $pengguna->sekolah_id;
         $this->nama = $pengguna->nama;
@@ -39,6 +43,8 @@ class Edit extends Component
         $this->nip_nuptk = $pengguna->nip_nuptk;
         $this->no_telepon = $pengguna->no_telepon;
         $this->status_aktif = $pengguna->status_aktif;
+
+        $this->sekolahTerkunci = auth()->user()->hasRole('kepala_sekolah');
     }
 
     public function simpan(PenggunaService $penggunaService): void
@@ -52,6 +58,10 @@ class Edit extends Component
             'no_telepon' => ['nullable', 'string', 'max:255'],
             'status_aktif' => ['boolean'],
         ]);
+
+        if ($this->sekolahTerkunci) {
+            $data['sekolah_id'] = $this->pengguna->sekolah_id;
+        }
 
         $penggunaService->update($this->pengguna->id, $data);
 

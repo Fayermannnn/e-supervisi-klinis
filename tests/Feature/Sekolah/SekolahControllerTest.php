@@ -4,17 +4,19 @@ namespace Tests\Feature\Sekolah;
 
 use App\Models\Pengguna;
 use App\Models\Sekolah;
+use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\Concerns\InteractsWithRoles;
 use Tests\TestCase;
 
 class SekolahControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithRoles, RefreshDatabase;
 
     private function actingAsPengguna(): void
     {
-        Sanctum::actingAs(Pengguna::factory()->create());
+        Sanctum::actingAs($this->penggunaWithRole('admin_dinas'));
     }
 
     public function test_guest_cannot_access_sekolah_endpoints(): void
@@ -22,6 +24,17 @@ class SekolahControllerTest extends TestCase
         $response = $this->getJson('/api/v1/sekolah');
 
         $response->assertStatus(401);
+    }
+
+    public function test_pengguna_without_permission_cannot_access_sekolah_endpoints(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+        Sanctum::actingAs(Pengguna::factory()->create());
+
+        $response = $this->getJson('/api/v1/sekolah');
+
+        $response->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'FORBIDDEN');
     }
 
     public function test_index_returns_paginated_sekolah(): void

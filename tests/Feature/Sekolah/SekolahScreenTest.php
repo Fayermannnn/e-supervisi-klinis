@@ -5,24 +5,31 @@ namespace Tests\Feature\Sekolah;
 use App\Livewire\Sekolah\Create;
 use App\Livewire\Sekolah\Edit;
 use App\Livewire\Sekolah\Index;
-use App\Models\Pengguna;
 use App\Models\Sekolah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Tests\Concerns\InteractsWithRoles;
 use Tests\TestCase;
 
 class SekolahScreenTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithRoles, RefreshDatabase;
 
     public function test_sekolah_index_requires_authentication(): void
     {
         $this->get('/sekolah')->assertRedirect(route('login'));
     }
 
+    public function test_pengguna_without_permission_cannot_access_sekolah_screen(): void
+    {
+        $this->actingAs($this->penggunaWithRole('guru'), 'web');
+
+        $this->get('/sekolah')->assertForbidden();
+    }
+
     public function test_sekolah_index_renders_and_lists_sekolah(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create(['nama_sekolah' => 'SDN 1 Sidoarjo']);
 
@@ -34,7 +41,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_index_can_delete_sekolah(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create();
 
@@ -45,14 +52,14 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_create_screen_renders(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $this->get('/sekolah/tambah')->assertOk()->assertSeeLivewire(Create::class);
     }
 
     public function test_sekolah_create_validates_required_fields(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         Livewire::test(Create::class)
             ->set('nama_sekolah', '')
@@ -62,7 +69,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_create_stores_new_sekolah_and_redirects(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         Livewire::test(Create::class)
             ->set('nama_sekolah', 'SDN 1 Sidoarjo')
@@ -76,7 +83,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_create_rejects_duplicate_npsn(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         Sekolah::factory()->create(['npsn' => '20501234']);
 
@@ -89,7 +96,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_edit_screen_loads_existing_values(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create(['nama_sekolah' => 'SDN Lama']);
 
@@ -99,7 +106,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_edit_updates_sekolah_and_redirects(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create(['nama_sekolah' => 'SDN Lama']);
 
@@ -113,7 +120,7 @@ class SekolahScreenTest extends TestCase
 
     public function test_sekolah_edit_allows_keeping_its_own_npsn(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create(['npsn' => '20501234']);
 

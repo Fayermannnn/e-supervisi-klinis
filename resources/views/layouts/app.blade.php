@@ -12,8 +12,12 @@
         <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
             <a href="{{ route('beranda') }}" class="text-lg font-semibold text-slate-800">{{ config('app.name') }}</a>
             <nav class="flex items-center gap-6 text-sm text-slate-600">
-                <a href="{{ route('app.sekolah.index') }}" class="hover:text-slate-900">Sekolah</a>
-                <a href="{{ route('app.pengguna.index') }}" class="hover:text-slate-900">Pengguna</a>
+                @can('sekolah.manage')
+                    <a href="{{ route('app.sekolah.index') }}" class="hover:text-slate-900">Sekolah</a>
+                @endcan
+                @can('pengguna.manage')
+                    <a href="{{ route('app.pengguna.index') }}" class="hover:text-slate-900">Pengguna</a>
+                @endcan
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="rounded-md bg-slate-800 px-3 py-1.5 text-white hover:bg-slate-700">

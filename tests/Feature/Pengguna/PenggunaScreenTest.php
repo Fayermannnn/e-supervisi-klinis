@@ -10,20 +10,52 @@ use App\Models\Sekolah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
+use Tests\Concerns\InteractsWithRoles;
 use Tests\TestCase;
 
 class PenggunaScreenTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithRoles, RefreshDatabase;
 
     public function test_pengguna_index_requires_authentication(): void
     {
         $this->get('/pengguna')->assertRedirect(route('login'));
     }
 
+    public function test_pengguna_without_permission_cannot_access_pengguna_screen(): void
+    {
+        $this->actingAs($this->penggunaWithRole('guru'), 'web');
+
+        $this->get('/pengguna')->assertForbidden();
+    }
+
+    public function test_kepala_sekolah_sekolah_field_is_locked_to_own_sekolah(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+
+        $this->actingAs($this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolah->id]), 'web');
+
+        Livewire::test(Create::class)
+            ->assertSet('sekolah_id', $sekolah->id)
+            ->assertSet('sekolahTerkunci', true);
+    }
+
+    public function test_kepala_sekolah_cannot_open_edit_screen_for_other_sekolah_pengguna(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+
+        $this->actingAs($this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]), 'web');
+
+        $targetLain = Pengguna::factory()->create(['sekolah_id' => $sekolahLain->id]);
+
+        Livewire::test(Edit::class, ['pengguna' => $targetLain])
+            ->assertForbidden();
+    }
+
     public function test_pengguna_index_renders_and_lists_pengguna(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $pengguna = Pengguna::factory()->create(['nama' => 'Budi Santoso']);
 
@@ -35,7 +67,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_index_can_delete_pengguna(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $pengguna = Pengguna::factory()->create();
 
@@ -46,14 +78,14 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_create_screen_renders(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $this->get('/pengguna/tambah')->assertOk()->assertSeeLivewire(Create::class);
     }
 
     public function test_pengguna_create_validates_required_fields(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         Livewire::test(Create::class)
             ->set('nama', '')
@@ -65,7 +97,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_create_stores_new_pengguna_with_hashed_password(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $sekolah = Sekolah::factory()->create();
 
@@ -84,7 +116,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_create_rejects_duplicate_email(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         Pengguna::factory()->create(['email' => 'dup@sidoarjo.go.id']);
 
@@ -98,7 +130,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_edit_screen_loads_existing_values(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $pengguna = Pengguna::factory()->create(['nama' => 'Nama Lama']);
 
@@ -108,7 +140,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_edit_updates_without_changing_password_when_blank(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $pengguna = Pengguna::factory()->create(['nama' => 'Nama Lama']);
         $originalPassword = $pengguna->password;
@@ -124,7 +156,7 @@ class PenggunaScreenTest extends TestCase
 
     public function test_pengguna_edit_can_change_password(): void
     {
-        $this->actingAs(Pengguna::factory()->create(), 'web');
+        $this->actingAs($this->penggunaWithRole('admin_dinas'), 'web');
 
         $pengguna = Pengguna::factory()->create();
 
