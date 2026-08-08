@@ -7,15 +7,16 @@ use App\Models\Sekolah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
+use Tests\Concerns\InteractsWithRoles;
 use Tests\TestCase;
 
 class PenggunaControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use InteractsWithRoles, RefreshDatabase;
 
     private function actingAsPengguna(): void
     {
-        Sanctum::actingAs(Pengguna::factory()->create());
+        Sanctum::actingAs($this->penggunaWithRole('admin_dinas'));
     }
 
     public function test_guest_cannot_access_pengguna_endpoints(): void
@@ -23,6 +24,65 @@ class PenggunaControllerTest extends TestCase
         $response = $this->getJson('/api/v1/pengguna');
 
         $response->assertStatus(401);
+    }
+
+    public function test_pengguna_without_permission_cannot_access_pengguna_endpoints(): void
+    {
+        Sanctum::actingAs($this->penggunaWithRole('guru'));
+
+        $response = $this->getJson('/api/v1/pengguna');
+
+        $response->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'FORBIDDEN');
+    }
+
+    public function test_kepala_sekolah_only_sees_pengguna_in_own_sekolah(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+
+        Sanctum::actingAs($this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]));
+
+        Pengguna::factory()->count(2)->create(['sekolah_id' => $sekolahSendiri->id]);
+        Pengguna::factory()->count(3)->create(['sekolah_id' => $sekolahLain->id]);
+
+        $response = $this->getJson('/api/v1/pengguna');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('meta.total', 3); // 2 + akun kepala sekolah sendiri
+    }
+
+    public function test_kepala_sekolah_cannot_create_pengguna_for_other_sekolah(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+
+        Sanctum::actingAs($this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]));
+
+        $response = $this->postJson('/api/v1/pengguna', [
+            'sekolah_id' => $sekolahLain->id,
+            'nama' => 'Guru Sekolah Lain',
+            'email' => 'guru.lain@sidoarjo.go.id',
+            'password' => 'rahasia123',
+        ]);
+
+        $response->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'FORBIDDEN');
+    }
+
+    public function test_kepala_sekolah_cannot_view_pengguna_from_other_sekolah(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+
+        Sanctum::actingAs($this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]));
+
+        $targetLain = Pengguna::factory()->create(['sekolah_id' => $sekolahLain->id]);
+
+        $response = $this->getJson("/api/v1/pengguna/{$targetLain->id}");
+
+        $response->assertStatus(403)
+            ->assertJsonPath('errors.0.code', 'FORBIDDEN');
     }
 
     public function test_index_returns_paginated_pengguna(): void

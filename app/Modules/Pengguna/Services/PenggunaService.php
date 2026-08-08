@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Hash;
 
 class PenggunaService
 {
-    public function list(int $perPage = 15): LengthAwarePaginator
+    public function list(int $perPage = 15, ?string $sekolahId = null): LengthAwarePaginator
     {
-        return Pengguna::query()->with('sekolah')->paginate($perPage);
+        return Pengguna::query()
+            ->with('sekolah')
+            ->when($sekolahId, fn ($query) => $query->where('sekolah_id', $sekolahId))
+            ->paginate($perPage);
     }
 
     /**

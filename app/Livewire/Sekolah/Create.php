@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Sekolah;
 
+use App\Models\Sekolah;
 use App\Modules\Sekolah\Services\SekolahService;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -16,6 +17,11 @@ class Create extends Component
     public ?string $npsn = null;
 
     public ?string $alamat = null;
+
+    public function mount(): void
+    {
+        $this->authorize('create', Sekolah::class);
+    }
 
     public function simpan(SekolahService $sekolahService): void
     {

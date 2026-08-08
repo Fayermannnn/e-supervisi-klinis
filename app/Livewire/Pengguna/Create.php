@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pengguna;
 
+use App\Models\Pengguna as PenggunaModel;
 use App\Models\Sekolah;
 use App\Modules\Pengguna\Services\PenggunaService;
 use Livewire\Attributes\Layout;
@@ -24,6 +25,19 @@ class Create extends Component
 
     public ?string $no_telepon = null;
 
+    public bool $sekolahTerkunci = false;
+
+    public function mount(): void
+    {
+        /** @var PenggunaModel $actor */
+        $actor = auth()->user();
+
+        if ($actor->hasRole('kepala_sekolah')) {
+            $this->sekolah_id = $actor->sekolah_id;
+            $this->sekolahTerkunci = true;
+        }
+    }
+
     public function simpan(PenggunaService $penggunaService): void
     {
         $data = $this->validate([
@@ -34,6 +48,8 @@ class Create extends Component
             'nip_nuptk' => ['nullable', 'string', 'max:255'],
             'no_telepon' => ['nullable', 'string', 'max:255'],
         ]);
+
+        $this->authorize('create', [PenggunaModel::class, $data['sekolah_id'] ?? null]);
 
         $penggunaService->create($data);
 
