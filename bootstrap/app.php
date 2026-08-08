@@ -1,6 +1,8 @@
 <?php
 
 use App\Exceptions\ApiException;
+use App\Http\Middleware\AuditLogging;
+use App\Http\Middleware\CorrelationId;
 use App\Http\Middleware\EnsureTwoFactorIsConfigured;
 use App\Http\Middleware\RequirePermission;
 use App\Support\ApiResponse;
@@ -23,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->appendToGroup('web', EnsureTwoFactorIsConfigured::class);
+
+        $middleware->prependToGroup('web', [CorrelationId::class, AuditLogging::class]);
+        $middleware->prependToGroup('api', [CorrelationId::class, AuditLogging::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (ApiException $e) {
