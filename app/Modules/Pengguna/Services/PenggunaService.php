@@ -11,7 +11,7 @@ class PenggunaService
 {
     public function list(int $perPage = 15): LengthAwarePaginator
     {
-        return Pengguna::query()->paginate($perPage);
+        return Pengguna::query()->with('sekolah')->paginate($perPage);
     }
 
     /**
