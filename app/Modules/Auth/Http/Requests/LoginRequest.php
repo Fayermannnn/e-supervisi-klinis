@@ -19,6 +19,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+            'two_factor_code' => ['nullable', 'string'],
         ];
     }
 }

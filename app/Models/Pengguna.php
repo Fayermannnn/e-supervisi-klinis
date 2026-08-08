@@ -29,6 +29,8 @@ class Pengguna extends Authenticatable
 
     protected $hidden = [
         'password',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     protected function casts(): array
@@ -37,6 +39,9 @@ class Pengguna extends Authenticatable
             'email_verified_at' => 'datetime',
             'status_aktif' => 'boolean',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 

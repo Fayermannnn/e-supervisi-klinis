@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Auth;
 
+use App\Models\Pengguna;
 use App\Modules\Auth\Services\LoginRateLimiter;
+use App\Modules\Auth\Services\TwoFactorService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -16,7 +19,11 @@ class Login extends Component
 
     public string $password = '';
 
-    public function login(LoginRateLimiter $rateLimiter): void
+    public string $twoFactorCode = '';
+
+    public bool $butuhTwoFactor = false;
+
+    public function login(LoginRateLimiter $rateLimiter, TwoFactorService $twoFactorService): void
     {
         $this->validate([
             'email' => ['required', 'email'],
@@ -32,14 +39,35 @@ class Login extends Component
             return;
         }
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
+        $pengguna = Pengguna::where('email', $this->email)->first();
+
+        if (! $pengguna || ! Hash::check($this->password, $pengguna->password)) {
             $rateLimiter->hit($key);
             $this->addError('form', 'Email atau kata sandi salah.');
 
             return;
         }
 
+        if ($twoFactorService->wajib2fa($pengguna) && $twoFactorService->sudahAktif($pengguna)) {
+            if (! $this->butuhTwoFactor) {
+                $this->butuhTwoFactor = true;
+
+                return;
+            }
+
+            $this->validate(['twoFactorCode' => ['required', 'string']]);
+
+            if (! $twoFactorService->verifikasiLogin($pengguna, $this->twoFactorCode)) {
+                $rateLimiter->hit($key);
+                $this->addError('twoFactorCode', 'Kode verifikasi salah.');
+
+                return;
+            }
+        }
+
         $rateLimiter->clear($key);
+
+        Auth::login($pengguna);
 
         session()->regenerate();
 
