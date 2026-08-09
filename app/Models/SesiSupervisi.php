@@ -65,4 +65,9 @@ class SesiSupervisi extends Model
     {
         return $this->hasOne(UmpanBalik::class, 'sesi_id');
     }
+
+    public function rtl(): HasOne
+    {
+        return $this->hasOne(RencanaTindakLanjut::class, 'sesi_id');
+    }
 }

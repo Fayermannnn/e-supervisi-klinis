@@ -7,6 +7,7 @@ use App\Modules\Observasi\Http\Controllers\ObservasiController;
 use App\Modules\Pengguna\Http\Controllers\PenggunaController;
 use App\Modules\Perencanaan\Http\Controllers\SesiSupervisiController;
 use App\Modules\Sekolah\Http\Controllers\SekolahController;
+use App\Modules\TindakLanjut\Http\Controllers\RtlController;
 use App\Modules\UmpanBalik\Http\Controllers\UmpanBalikController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,14 @@ Route::prefix('v1')->group(function () {
                 ->name('sesi-supervisi.umpan-balik.pendekatan');
             Route::patch('/sesi-supervisi/{sesi_supervisi}/umpan-balik/refleksi', [UmpanBalikController::class, 'isiRefleksi'])
                 ->name('sesi-supervisi.umpan-balik.refleksi');
+            Route::post('/sesi-supervisi/{sesi_supervisi}/rtl', [RtlController::class, 'store'])
+                ->name('sesi-supervisi.rtl.store');
+            Route::patch('/sesi-supervisi/{sesi_supervisi}/rtl', [RtlController::class, 'update'])
+                ->name('sesi-supervisi.rtl.update');
+            Route::get('/sesi-supervisi/{sesi_supervisi}/rtl', [RtlController::class, 'show'])
+                ->name('sesi-supervisi.rtl.show');
+            Route::post('/sesi-supervisi/{sesi_supervisi}/selesaikan', [RtlController::class, 'selesaikan'])
+                ->name('sesi-supervisi.selesaikan');
         });
 
         Route::middleware('permission:instrumen.manage')->group(function () {

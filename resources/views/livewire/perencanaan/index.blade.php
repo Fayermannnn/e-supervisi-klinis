@@ -63,6 +63,12 @@
                                         class="ml-3 text-slate-600 hover:text-slate-900">Isi Refleksi</a>
                                 @endcan
                             @endif
+                            @can('create', [\App\Models\RencanaTindakLanjut::class, $item])
+                                @if (in_array($item->status, ['umpan_balik', 'rtl']))
+                                    <a href="{{ route('app.sesi-supervisi.rtl', $item) }}"
+                                        class="ml-3 text-slate-600 hover:text-slate-900">Isi RTL</a>
+                                @endif
+                            @endcan
                         </td>
                     </tr>
                 @empty
