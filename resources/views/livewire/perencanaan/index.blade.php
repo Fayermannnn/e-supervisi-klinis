@@ -40,6 +40,9 @@
                                 @if ($item->status === 'dijadwalkan')
                                     <a href="{{ route('app.sesi-supervisi.pra-observasi', $item) }}"
                                         class="text-slate-600 hover:text-slate-900">Isi Pra-Observasi</a>
+                                @elseif (in_array($item->status, ['pra_observasi', 'observasi']))
+                                    <a href="{{ route('app.sesi-supervisi.observasi', $item) }}"
+                                        class="text-slate-600 hover:text-slate-900">Isi Observasi</a>
                                 @endif
                             @endcan
                         </td>
