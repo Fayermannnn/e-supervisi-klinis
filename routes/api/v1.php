@@ -4,6 +4,8 @@ use App\Modules\Analisis\Http\Controllers\AnalisisController;
 use App\Modules\Auth\Http\Controllers\AuthController;
 use App\Modules\Instrumen\Http\Controllers\InstrumenController;
 use App\Modules\Observasi\Http\Controllers\ObservasiController;
+use App\Modules\PengembanganProfesional\Http\Controllers\MateriController;
+use App\Modules\PengembanganProfesional\Http\Controllers\RekomendasiController;
 use App\Modules\Pengguna\Http\Controllers\PenggunaController;
 use App\Modules\Perencanaan\Http\Controllers\SesiSupervisiController;
 use App\Modules\Sekolah\Http\Controllers\SekolahController;
@@ -47,6 +49,8 @@ Route::prefix('v1')->group(function () {
                 ->name('sesi-supervisi.rtl.show');
             Route::post('/sesi-supervisi/{sesi_supervisi}/selesaikan', [RtlController::class, 'selesaikan'])
                 ->name('sesi-supervisi.selesaikan');
+            Route::post('/sesi-supervisi/{sesi_supervisi}/rekomendasi', [RekomendasiController::class, 'rekomendasikanManual'])
+                ->name('sesi-supervisi.rekomendasi');
         });
 
         Route::middleware('permission:instrumen.manage')->group(function () {
@@ -59,6 +63,14 @@ Route::prefix('v1')->group(function () {
                 ->name('butir-observasi.update');
             Route::delete('/butir-observasi/{butir_observasi}', [InstrumenController::class, 'hapusButir'])
                 ->name('butir-observasi.destroy');
+        });
+
+        Route::middleware('permission:pengembangan.manage')->group(function () {
+            Route::apiResource('materi-pengembangan', MateriController::class)->only(['index', 'store', 'show', 'update', 'destroy']);
+            Route::get('/pengguna/{pengguna}/rekomendasi', [RekomendasiController::class, 'untukPengguna'])
+                ->name('pengguna.rekomendasi');
+            Route::patch('/rekomendasi/{rekomendasi}/status', [RekomendasiController::class, 'ubahStatus'])
+                ->name('rekomendasi.status');
         });
     });
 });

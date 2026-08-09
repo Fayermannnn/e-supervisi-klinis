@@ -2,6 +2,7 @@
 
 namespace App\Modules\TindakLanjut\Services;
 
+use App\Events\RtlDiisi;
 use App\Exceptions\RtlNotFoundException;
 use App\Exceptions\RtlRequiredBeforeCloseException;
 use App\Exceptions\SesiSupervisiNotFoundException;
@@ -43,6 +44,10 @@ class RtlService
 
         if ($sesi->status === 'umpan_balik') {
             $sesi->update(['status' => 'rtl']);
+        }
+
+        if ($rtl->kategori) {
+            RtlDiisi::dispatch($rtl);
         }
 
         return $rtl;

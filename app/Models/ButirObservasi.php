@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ButirObservasi extends Model
@@ -33,5 +34,15 @@ class ButirObservasi extends Model
     public function instrumen(): BelongsTo
     {
         return $this->belongsTo(InstrumenObservasi::class, 'instrumen_id');
+    }
+
+    /**
+     * Pemetaan butir->materi PD (Addendum 02, BR-09b). Pivot dibuat
+     * Sprint 4, FK materi_id ditambahkan Sprint 8B setelah
+     * materi_pengembangan ada.
+     */
+    public function materiPengembangan(): BelongsToMany
+    {
+        return $this->belongsToMany(MateriPengembangan::class, 'butir_observasi_materi', 'butir_observasi_id', 'materi_id');
     }
 }

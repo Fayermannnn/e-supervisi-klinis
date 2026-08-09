@@ -2,6 +2,7 @@
 
 namespace App\Modules\Observasi\Services;
 
+use App\Events\HasilObservasiDifinalisasi;
 use App\Exceptions\ButirTidakSesuaiInstrumenException;
 use App\Exceptions\HasilObservasiBelumLengkapException;
 use App\Exceptions\InstrumenAktifTidakTersediaException;
@@ -89,6 +90,12 @@ class HasilObservasiService
         $sesi->status = $status;
         $sesi->save();
 
-        return $sesi->fresh(['hasilObservasi']);
+        $sesi = $sesi->fresh(['hasilObservasi']);
+
+        if ($status === 'dianalisis') {
+            HasilObservasiDifinalisasi::dispatch($sesi);
+        }
+
+        return $sesi;
     }
 }

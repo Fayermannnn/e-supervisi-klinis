@@ -24,6 +24,7 @@ class RoleAndPermissionSeeder extends Seeder
             'sesi-supervisi.manage',
             'notifikasi.manage',
             'instrumen.manage',
+            'pengembangan.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -36,12 +37,13 @@ class RoleAndPermissionSeeder extends Seeder
             Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
 
-        // instrumen.manage: gerbang modul untuk semua peran (CRUD Matrix - hanya
-        // Admin Dinas yang boleh C/U/D, sisanya R saja; dibedakan di Policy).
+        // instrumen.manage & pengembangan.manage: gerbang modul untuk semua peran
+        // (CRUD Matrix - hanya Admin Dinas yang boleh C/U/D katalog, sisanya R saja
+        // / kelola rekomendasi miliknya sendiri; dibedakan di Policy).
         Role::findByName('admin_dinas')->syncPermissions($permissions);
-        Role::findByName('kepala_sekolah')->syncPermissions(['pengguna.manage', 'sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage']);
+        Role::findByName('kepala_sekolah')->syncPermissions(['pengguna.manage', 'sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage', 'pengembangan.manage']);
         Role::findByName('super_admin')->syncPermissions($permissions);
-        Role::findByName('guru')->syncPermissions(['sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage']);
-        Role::findByName('supervisor')->syncPermissions(['sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage']);
+        Role::findByName('guru')->syncPermissions(['sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage', 'pengembangan.manage']);
+        Role::findByName('supervisor')->syncPermissions(['sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage', 'pengembangan.manage']);
     }
 }

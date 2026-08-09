@@ -24,6 +24,9 @@
                 @can('instrumen.manage')
                     <a href="{{ route('app.instrumen.index') }}" class="hover:text-slate-900">Instrumen</a>
                 @endcan
+                @can('create', \App\Models\MateriPengembangan::class)
+                    <a href="{{ route('app.materi-pengembangan.index') }}" class="hover:text-slate-900">Materi Pengembangan</a>
+                @endcan
                 @can('notifikasi.manage')
                     @livewire('notifikasi.badge')
                 @endcan

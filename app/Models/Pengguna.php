@@ -65,4 +65,9 @@ class Pengguna extends Authenticatable
     {
         return $this->hasMany(Notifikasi::class);
     }
+
+    public function rekomendasiPengembangan(): HasMany
+    {
+        return $this->hasMany(RekomendasiPengembangan::class);
+    }
 }

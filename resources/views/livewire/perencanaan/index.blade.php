@@ -69,6 +69,12 @@
                                         class="ml-3 text-slate-600 hover:text-slate-900">Isi RTL</a>
                                 @endif
                             @endcan
+                            @can('create', [\App\Models\RekomendasiPengembangan::class, $item])
+                                @if ($item->umpanBalik)
+                                    <a href="{{ route('app.sesi-supervisi.rekomendasi', $item) }}"
+                                        class="ml-3 text-slate-600 hover:text-slate-900">Rekomendasikan Materi</a>
+                                @endif
+                            @endcan
                         </td>
                     </tr>
                 @empty
