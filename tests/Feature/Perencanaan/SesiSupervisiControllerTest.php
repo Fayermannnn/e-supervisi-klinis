@@ -84,6 +84,11 @@ class SesiSupervisiControllerTest extends TestCase
             ->assertJsonPath('errors.0.code', 'BR02_SUPERVISOR_EQUALS_GURU');
     }
 
+    /**
+     * TC-PERENCANAAN-003 (BR-05): akses data individual dibatasi
+     * guru/supervisor terkait/kepsek/Admin Dinas - guru hanya melihat
+     * sesinya sendiri.
+     */
     public function test_guru_can_view_own_sesi_but_not_others(): void
     {
         $guru = $this->penggunaWithRole('guru');
@@ -93,6 +98,86 @@ class SesiSupervisiControllerTest extends TestCase
 
         $this->getJson("/api/v1/sesi-supervisi/{$sesiSendiri->id}")->assertStatus(200);
         $this->getJson("/api/v1/sesi-supervisi/{$sesiOrangLain->id}")->assertStatus(403);
+    }
+
+    /**
+     * TC-PERENCANAAN-003 (BR-05): Kepala Sekolah hanya melihat sesi di
+     * sekolahnya sendiri, ditolak untuk sekolah lain.
+     */
+    public function test_kepala_sekolah_can_view_sesi_di_sekolahnya_tapi_tidak_sekolah_lain(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+        $kepsek = $this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]);
+        $sesiDiSekolahSendiri = SesiSupervisi::factory()->create(['sekolah_id' => $sekolahSendiri->id]);
+        $sesiDiSekolahLain = SesiSupervisi::factory()->create(['sekolah_id' => $sekolahLain->id]);
+        Sanctum::actingAs($kepsek);
+
+        $this->getJson("/api/v1/sesi-supervisi/{$sesiDiSekolahSendiri->id}")->assertStatus(200);
+        $this->getJson("/api/v1/sesi-supervisi/{$sesiDiSekolahLain->id}")->assertStatus(403);
+    }
+
+    /**
+     * TC-PERENCANAAN-004 (BR-07): tipe_supervisor hanya menerima
+     * internal/eksternal, nilai lain ditolak.
+     */
+    public function test_store_menolak_tipe_supervisor_yang_tidak_valid(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+        $guru = $this->penggunaWithRole('guru', ['sekolah_id' => $sekolah->id]);
+        $supervisor = $this->penggunaWithRole('supervisor');
+        Sanctum::actingAs($supervisor);
+
+        $response = $this->postJson('/api/v1/sesi-supervisi', [
+            'guru_id' => $guru->id,
+            'supervisor_id' => $supervisor->id,
+            'tipe_supervisor' => 'bukan_nilai_valid',
+            'tanggal' => now()->addDay()->toDateString(),
+        ]);
+
+        $response->assertStatus(422)->assertJsonValidationErrors('tipe_supervisor');
+    }
+
+    /**
+     * TC-PERENCANAAN-004 (BR-07): nilai valid "internal" diterima dan
+     * tersimpan apa adanya.
+     */
+    public function test_store_menerima_tipe_supervisor_internal(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+        $guru = $this->penggunaWithRole('guru', ['sekolah_id' => $sekolah->id]);
+        $supervisor = $this->penggunaWithRole('supervisor');
+        Sanctum::actingAs($supervisor);
+
+        $response = $this->postJson('/api/v1/sesi-supervisi', [
+            'guru_id' => $guru->id,
+            'supervisor_id' => $supervisor->id,
+            'tipe_supervisor' => 'internal',
+            'tanggal' => now()->addDay()->toDateString(),
+        ]);
+
+        $response->assertStatus(201)->assertJsonPath('data.tipe_supervisor', 'internal');
+    }
+
+    /**
+     * TC-PERENCANAAN-004 (BR-07): nilai valid "eksternal" diterima dan
+     * tersimpan apa adanya.
+     */
+    public function test_store_menerima_tipe_supervisor_eksternal(): void
+    {
+        $sekolah = Sekolah::factory()->create();
+        $guru = $this->penggunaWithRole('guru', ['sekolah_id' => $sekolah->id]);
+        $supervisor = $this->penggunaWithRole('supervisor');
+        Sanctum::actingAs($supervisor);
+
+        $response = $this->postJson('/api/v1/sesi-supervisi', [
+            'guru_id' => $guru->id,
+            'supervisor_id' => $supervisor->id,
+            'tipe_supervisor' => 'eksternal',
+            'tanggal' => now()->addDay()->toDateString(),
+        ]);
+
+        $response->assertStatus(201)->assertJsonPath('data.tipe_supervisor', 'eksternal');
     }
 
     public function test_supervisor_can_isi_pra_observasi_untuk_sesi_yang_ditangani(): void

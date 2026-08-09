@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\UmpanBalik;
 
+use App\Models\Sekolah;
 use App\Models\SesiSupervisi;
 use App\Models\UmpanBalik;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,6 +51,11 @@ class UmpanBalikControllerTest extends TestCase
             ->assertStatus(403);
     }
 
+    /**
+     * TC-UMPANBALIK-004 (BR-05): akses data individual dibatasi
+     * guru/supervisor terkait/kepsek/Admin Dinas - guru hanya melihat
+     * umpan baliknya sendiri secara utuh (tidak diredaksi).
+     */
     public function test_guru_bisa_melihat_umpan_balik_miliknya_secara_utuh(): void
     {
         $guru = $this->penggunaWithRole('guru');
@@ -62,6 +68,43 @@ class UmpanBalikControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('data.kekuatan', 'Rahasia formatif')
             ->assertJsonPath('data.redacted', false);
+    }
+
+    /**
+     * TC-UMPANBALIK-004 (BR-05): guru lain (tidak terkait sesi) ditolak
+     * sepenuhnya - berbeda dari Admin Dinas yang tetap diizinkan masuk
+     * dengan redaksi (BR-08).
+     */
+    public function test_guru_lain_tidak_bisa_melihat_umpan_balik_guru_lain(): void
+    {
+        $guruLain = $this->penggunaWithRole('guru');
+        $sesi = SesiSupervisi::factory()->create();
+        UmpanBalik::factory()->create(['sesi_id' => $sesi->id]);
+        Sanctum::actingAs($guruLain);
+
+        $this->getJson("/api/v1/sesi-supervisi/{$sesi->id}/umpan-balik")->assertStatus(403);
+    }
+
+    /**
+     * TC-UMPANBALIK-004 (BR-05): Kepala Sekolah hanya melihat umpan balik
+     * sesi di sekolahnya, ditolak untuk sekolah lain.
+     */
+    public function test_kepala_sekolah_bisa_melihat_umpan_balik_sekolahnya_tapi_tidak_sekolah_lain(): void
+    {
+        $sekolahSendiri = Sekolah::factory()->create();
+        $sekolahLain = Sekolah::factory()->create();
+        $kepsek = $this->penggunaWithRole('kepala_sekolah', ['sekolah_id' => $sekolahSendiri->id]);
+
+        $sesiSendiri = SesiSupervisi::factory()->create(['sekolah_id' => $sekolahSendiri->id]);
+        UmpanBalik::factory()->create(['sesi_id' => $sesiSendiri->id]);
+
+        $sesiLain = SesiSupervisi::factory()->create(['sekolah_id' => $sekolahLain->id]);
+        UmpanBalik::factory()->create(['sesi_id' => $sesiLain->id]);
+
+        Sanctum::actingAs($kepsek);
+
+        $this->getJson("/api/v1/sesi-supervisi/{$sesiSendiri->id}/umpan-balik")->assertStatus(200);
+        $this->getJson("/api/v1/sesi-supervisi/{$sesiLain->id}/umpan-balik")->assertStatus(403);
     }
 
     /**

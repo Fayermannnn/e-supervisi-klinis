@@ -87,6 +87,16 @@ services:
     networks:
       - esupervisi
 
+  # Sprint 11: Dusk E2E (Laravel + Chromium dalam satu container Selenium,
+  # bukan bagian environment lokal harian - hanya jalan saat `php artisan dusk`).
+  selenium:
+    image: selenium/standalone-chromium:126.0
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+    networks:
+      - esupervisi
+
 networks:
   esupervisi:
     driver: bridge

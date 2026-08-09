@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
 
-    Route::middleware('auth:sanctum')->group(function () {
+    // Sprint 11 (OWASP A04): rate limit umum di luar login (yang sudah
+    // punya LoginRateLimiter kustom sejak Sprint 1) - sebelum ini tidak ada
+    // batas laju sama sekali di luar endpoint login.
+    Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
         Route::middleware('permission:sekolah.manage')->group(function () {
             Route::apiResource('sekolah', SekolahController::class);
         });

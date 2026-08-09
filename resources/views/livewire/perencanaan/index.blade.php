@@ -75,6 +75,10 @@
                                         class="ml-3 text-slate-600 hover:text-slate-900">Rekomendasikan Materi</a>
                                 @endif
                             @endcan
+                            @can('laporan.drillDownIndividual')
+                                <a href="{{ route('app.laporan.individual', $item) }}"
+                                    class="ml-3 text-slate-600 hover:text-slate-900">Detail (Justifikasi)</a>
+                            @endcan
                         </td>
                     </tr>
                 @empty
