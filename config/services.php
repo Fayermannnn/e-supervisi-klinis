@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // Sprint 10 (Modul 12): integrasi WhatsApp Fonnte (SDD Bagian I.15 Sprint 10).
+    'fonnte' => [
+        'token' => env('FONNTE_TOKEN'),
+        'url' => env('FONNTE_URL', 'https://api.fonnte.com/send'),
+    ],
+
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Analisis\RingkasanSkor;
+use App\Livewire\AuditLog\LogAudit;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\SetupTwoFactor;
 use App\Livewire\Instrumen\Create as InstrumenCreate;
@@ -83,4 +84,8 @@ Route::middleware(['auth', 'permission:pengembangan.manage'])->name('app.')->gro
 Route::middleware(['auth', 'permission:laporan.manage'])->name('app.')->group(function () {
     Route::get('/laporan/dashboard', DashboardAdminDinas::class)->name('laporan.dashboard');
     Route::get('/laporan/sekolah/{sekolah}', LaporanSekolah::class)->name('laporan.sekolah');
+});
+
+Route::middleware(['auth', 'permission:audit-log.manage'])->name('app.')->group(function () {
+    Route::get('/audit-log', LogAudit::class)->name('audit-log.index');
 });

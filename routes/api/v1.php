@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Analisis\Http\Controllers\AnalisisController;
+use App\Modules\AuditLog\Http\Controllers\AuditLogController;
 use App\Modules\Auth\Http\Controllers\AuthController;
 use App\Modules\Instrumen\Http\Controllers\InstrumenController;
 use App\Modules\Observasi\Http\Controllers\ObservasiController;
@@ -81,6 +82,10 @@ Route::prefix('v1')->group(function () {
                 ->name('laporan.dashboard');
             Route::post('/laporan/individual/{sesi_supervisi}', [LaporanController::class, 'individual'])
                 ->name('laporan.individual');
+        });
+
+        Route::middleware('permission:audit-log.manage')->group(function () {
+            Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log.index');
         });
     });
 });

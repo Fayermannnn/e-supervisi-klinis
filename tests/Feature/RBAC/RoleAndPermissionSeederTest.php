@@ -35,6 +35,7 @@ class RoleAndPermissionSeederTest extends TestCase
         $this->assertTrue(Permission::where('name', 'instrumen.manage')->exists());
         $this->assertTrue(Permission::where('name', 'pengembangan.manage')->exists());
         $this->assertTrue(Permission::where('name', 'laporan.manage')->exists());
+        $this->assertTrue(Permission::where('name', 'audit-log.manage')->exists());
     }
 
     public function test_admin_dinas_can_manage_sekolah_and_pengguna(): void
@@ -120,12 +121,28 @@ class RoleAndPermissionSeederTest extends TestCase
         $this->assertFalse(Role::findByName('supervisor')->hasPermissionTo('laporan.manage'));
     }
 
+    /**
+     * Sprint 10: audit-log.manage adalah satu-satunya permission yang
+     * TIDAK ikut grant admin_dinas meskipun admin_dinas biasanya identik
+     * dengan super_admin - "Super Admin telusuri" (Sprint 10 AC).
+     */
+    public function test_hanya_super_admin_bisa_reach_audit_log(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+
+        $this->assertTrue(Role::findByName('super_admin')->hasPermissionTo('audit-log.manage'));
+        $this->assertFalse(Role::findByName('admin_dinas')->hasPermissionTo('audit-log.manage'));
+        $this->assertFalse(Role::findByName('kepala_sekolah')->hasPermissionTo('audit-log.manage'));
+        $this->assertFalse(Role::findByName('guru')->hasPermissionTo('audit-log.manage'));
+        $this->assertFalse(Role::findByName('supervisor')->hasPermissionTo('audit-log.manage'));
+    }
+
     public function test_seeder_is_idempotent(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);
         $this->seed(RoleAndPermissionSeeder::class);
 
         $this->assertSame(5, Role::count());
-        $this->assertSame(7, Permission::count());
+        $this->assertSame(8, Permission::count());
     }
 }

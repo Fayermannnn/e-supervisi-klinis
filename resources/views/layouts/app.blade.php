@@ -33,6 +33,9 @@
                 @if (auth()->user()?->hasRole('kepala_sekolah') && auth()->user()->can('laporan.manage') && auth()->user()->sekolah_id)
                     <a href="{{ route('app.laporan.sekolah', auth()->user()->sekolah_id) }}" class="hover:text-slate-900">Laporan Sekolah</a>
                 @endif
+                @can('viewAny', \App\Models\AuditLog::class)
+                    <a href="{{ route('app.audit-log.index') }}" class="hover:text-slate-900">Log Audit</a>
+                @endcan
                 @can('notifikasi.manage')
                     @livewire('notifikasi.badge')
                 @endcan

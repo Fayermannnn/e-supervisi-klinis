@@ -26,6 +26,7 @@ class RoleAndPermissionSeeder extends Seeder
             'instrumen.manage',
             'pengembangan.manage',
             'laporan.manage',
+            'audit-log.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -45,7 +46,11 @@ class RoleAndPermissionSeeder extends Seeder
         // pernah mengakses Pelaporan (bukan bagian alur kerja harian mereka), hanya
         // Kepala Sekolah (Laporan Sekolah miliknya) dan Admin Dinas/Super Admin
         // (Dashboard Agregat + drill-down BR-08).
-        Role::findByName('admin_dinas')->syncPermissions($permissions);
+        // audit-log.manage (Sprint 10): SATU-SATUNYA permission yang TIDAK ikut
+        // grant admin_dinas meskipun admin_dinas biasanya identik dengan
+        // super_admin - "Super Admin telusuri" (Sprint 10 AC) berarti Log Audit
+        // sengaja dikecualikan dari akses admin_dinas.
+        Role::findByName('admin_dinas')->syncPermissions(array_diff($permissions, ['audit-log.manage']));
         Role::findByName('kepala_sekolah')->syncPermissions(['pengguna.manage', 'sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage', 'pengembangan.manage', 'laporan.manage']);
         Role::findByName('super_admin')->syncPermissions($permissions);
         Role::findByName('guru')->syncPermissions(['sesi-supervisi.manage', 'notifikasi.manage', 'instrumen.manage', 'pengembangan.manage']);
