@@ -21,6 +21,9 @@
                 @can('sesi-supervisi.manage')
                     <a href="{{ route('app.sesi-supervisi.index') }}" class="hover:text-slate-900">Sesi Supervisi</a>
                 @endcan
+                @can('instrumen.manage')
+                    <a href="{{ route('app.instrumen.index') }}" class="hover:text-slate-900">Instrumen</a>
+                @endcan
                 @can('notifikasi.manage')
                     @livewire('notifikasi.badge')
                 @endcan

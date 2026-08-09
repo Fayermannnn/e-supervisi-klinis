@@ -18,6 +18,7 @@ class SesiSupervisi extends Model
         'sekolah_id',
         'guru_id',
         'supervisor_id',
+        'instrumen_id',
         'tipe_supervisor',
         'status',
         'tanggal',
@@ -46,5 +47,10 @@ class SesiSupervisi extends Model
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'supervisor_id');
+    }
+
+    public function instrumen(): BelongsTo
+    {
+        return $this->belongsTo(InstrumenObservasi::class, 'instrumen_id');
     }
 }

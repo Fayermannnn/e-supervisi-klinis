@@ -2,6 +2,9 @@
 
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\SetupTwoFactor;
+use App\Livewire\Instrumen\Create as InstrumenCreate;
+use App\Livewire\Instrumen\Index as InstrumenIndex;
+use App\Livewire\Instrumen\Kelola as InstrumenKelola;
 use App\Livewire\Pengguna\Create as PenggunaCreate;
 use App\Livewire\Pengguna\Edit as PenggunaEdit;
 use App\Livewire\Pengguna\Index as PenggunaIndex;
@@ -50,4 +53,10 @@ Route::middleware(['auth', 'permission:sesi-supervisi.manage'])->name('app.')->g
     Route::get('/sesi-supervisi', SesiSupervisiIndex::class)->name('sesi-supervisi.index');
     Route::get('/sesi-supervisi/buat-jadwal', BuatJadwal::class)->name('sesi-supervisi.create');
     Route::get('/sesi-supervisi/{sesiSupervisi}/pra-observasi', PraObservasi::class)->name('sesi-supervisi.pra-observasi');
+});
+
+Route::middleware(['auth', 'permission:instrumen.manage'])->name('app.')->group(function () {
+    Route::get('/instrumen', InstrumenIndex::class)->name('instrumen.index');
+    Route::get('/instrumen/buat', InstrumenCreate::class)->name('instrumen.create');
+    Route::get('/instrumen/{instrumen}/kelola', InstrumenKelola::class)->name('instrumen.kelola');
 });
