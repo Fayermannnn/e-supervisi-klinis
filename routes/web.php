@@ -7,6 +7,8 @@ use App\Livewire\Instrumen\Create as InstrumenCreate;
 use App\Livewire\Instrumen\Index as InstrumenIndex;
 use App\Livewire\Instrumen\Kelola as InstrumenKelola;
 use App\Livewire\Observasi\FormObservasi;
+use App\Livewire\Pelaporan\DashboardAdminDinas;
+use App\Livewire\Pelaporan\LaporanSekolah;
 use App\Livewire\PengembanganProfesional\FormRekomendasiManual;
 use App\Livewire\PengembanganProfesional\KatalogMateri;
 use App\Livewire\Pengguna\Create as PenggunaCreate;
@@ -76,4 +78,9 @@ Route::middleware(['auth', 'permission:instrumen.manage'])->name('app.')->group(
 
 Route::middleware(['auth', 'permission:pengembangan.manage'])->name('app.')->group(function () {
     Route::get('/materi-pengembangan', KatalogMateri::class)->name('materi-pengembangan.index');
+});
+
+Route::middleware(['auth', 'permission:laporan.manage'])->name('app.')->group(function () {
+    Route::get('/laporan/dashboard', DashboardAdminDinas::class)->name('laporan.dashboard');
+    Route::get('/laporan/sekolah/{sekolah}', LaporanSekolah::class)->name('laporan.sekolah');
 });

@@ -27,6 +27,12 @@
                 @can('create', \App\Models\MateriPengembangan::class)
                     <a href="{{ route('app.materi-pengembangan.index') }}" class="hover:text-slate-900">Materi Pengembangan</a>
                 @endcan
+                @can('laporan.viewDashboard')
+                    <a href="{{ route('app.laporan.dashboard') }}" class="hover:text-slate-900">Dashboard</a>
+                @endcan
+                @if (auth()->user()?->hasRole('kepala_sekolah') && auth()->user()->can('laporan.manage') && auth()->user()->sekolah_id)
+                    <a href="{{ route('app.laporan.sekolah', auth()->user()->sekolah_id) }}" class="hover:text-slate-900">Laporan Sekolah</a>
+                @endif
                 @can('notifikasi.manage')
                     @livewire('notifikasi.badge')
                 @endcan

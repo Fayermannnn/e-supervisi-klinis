@@ -13,11 +13,15 @@ class AuditLogService
         ?string $deskripsi = null,
         ?string $ipAddress = null,
         ?string $correlationId = null,
+        ?string $modelType = null,
+        ?string $modelId = null,
     ): AuditLog {
         return AuditLog::create([
             'pengguna_id' => $pengguna?->id,
             'aksi' => $aksi,
             'deskripsi' => $deskripsi,
+            'model_type' => $modelType,
+            'model_id' => $modelId,
             'ip_address' => $ipAddress,
             'correlation_id' => $correlationId,
         ]);

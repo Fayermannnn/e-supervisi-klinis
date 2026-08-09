@@ -4,6 +4,7 @@ use App\Modules\Analisis\Http\Controllers\AnalisisController;
 use App\Modules\Auth\Http\Controllers\AuthController;
 use App\Modules\Instrumen\Http\Controllers\InstrumenController;
 use App\Modules\Observasi\Http\Controllers\ObservasiController;
+use App\Modules\Pelaporan\Http\Controllers\LaporanController;
 use App\Modules\PengembanganProfesional\Http\Controllers\MateriController;
 use App\Modules\PengembanganProfesional\Http\Controllers\RekomendasiController;
 use App\Modules\Pengguna\Http\Controllers\PenggunaController;
@@ -71,6 +72,15 @@ Route::prefix('v1')->group(function () {
                 ->name('pengguna.rekomendasi');
             Route::patch('/rekomendasi/{rekomendasi}/status', [RekomendasiController::class, 'ubahStatus'])
                 ->name('rekomendasi.status');
+        });
+
+        Route::middleware('permission:laporan.manage')->group(function () {
+            Route::get('/laporan/sekolah/{sekolah}', [LaporanController::class, 'sekolah'])
+                ->name('laporan.sekolah');
+            Route::get('/laporan/dashboard', [LaporanController::class, 'dashboard'])
+                ->name('laporan.dashboard');
+            Route::post('/laporan/individual/{sesi_supervisi}', [LaporanController::class, 'individual'])
+                ->name('laporan.individual');
         });
     });
 });
