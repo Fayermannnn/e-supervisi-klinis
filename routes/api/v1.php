@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Analisis\Http\Controllers\AnalisisController;
 use App\Modules\Auth\Http\Controllers\AuthController;
 use App\Modules\Instrumen\Http\Controllers\InstrumenController;
 use App\Modules\Observasi\Http\Controllers\ObservasiController;
@@ -26,6 +27,8 @@ Route::prefix('v1')->group(function () {
                 ->name('sesi-supervisi.pra-observasi');
             Route::post('/sesi-supervisi/{sesi_supervisi}/observasi', [ObservasiController::class, 'simpan'])
                 ->name('sesi-supervisi.observasi');
+            Route::get('/sesi-supervisi/{sesi_supervisi}/skor', [AnalisisController::class, 'skor'])
+                ->name('sesi-supervisi.skor');
         });
 
         Route::middleware('permission:instrumen.manage')->group(function () {

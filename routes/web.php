@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Analisis\RingkasanSkor;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\SetupTwoFactor;
 use App\Livewire\Instrumen\Create as InstrumenCreate;
@@ -55,6 +56,7 @@ Route::middleware(['auth', 'permission:sesi-supervisi.manage'])->name('app.')->g
     Route::get('/sesi-supervisi/buat-jadwal', BuatJadwal::class)->name('sesi-supervisi.create');
     Route::get('/sesi-supervisi/{sesiSupervisi}/pra-observasi', PraObservasi::class)->name('sesi-supervisi.pra-observasi');
     Route::get('/sesi-supervisi/{sesiSupervisi}/observasi', FormObservasi::class)->name('sesi-supervisi.observasi');
+    Route::get('/sesi-supervisi/{sesiSupervisi}/skor', RingkasanSkor::class)->name('sesi-supervisi.skor');
 });
 
 Route::middleware(['auth', 'permission:instrumen.manage'])->name('app.')->group(function () {

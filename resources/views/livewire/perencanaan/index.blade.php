@@ -45,6 +45,12 @@
                                         class="text-slate-600 hover:text-slate-900">Isi Observasi</a>
                                 @endif
                             @endcan
+                            @can('view', $item)
+                                @if (!in_array($item->status, ['draft', 'dijadwalkan', 'pra_observasi', 'observasi']))
+                                    <a href="{{ route('app.sesi-supervisi.skor', $item) }}"
+                                        class="ml-3 text-slate-600 hover:text-slate-900">Lihat Skor</a>
+                                @endif
+                            @endcan
                         </td>
                     </tr>
                 @empty
