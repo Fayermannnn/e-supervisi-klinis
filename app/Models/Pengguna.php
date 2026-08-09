@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -48,5 +49,20 @@ class Pengguna extends Authenticatable
     public function sekolah(): BelongsTo
     {
         return $this->belongsTo(Sekolah::class);
+    }
+
+    public function sesiSebagaiGuru(): HasMany
+    {
+        return $this->hasMany(SesiSupervisi::class, 'guru_id');
+    }
+
+    public function sesiSebagaiSupervisor(): HasMany
+    {
+        return $this->hasMany(SesiSupervisi::class, 'supervisor_id');
+    }
+
+    public function notifikasi(): HasMany
+    {
+        return $this->hasMany(Notifikasi::class);
     }
 }

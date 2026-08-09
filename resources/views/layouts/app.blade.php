@@ -18,6 +18,12 @@
                 @can('pengguna.manage')
                     <a href="{{ route('app.pengguna.index') }}" class="hover:text-slate-900">Pengguna</a>
                 @endcan
+                @can('sesi-supervisi.manage')
+                    <a href="{{ route('app.sesi-supervisi.index') }}" class="hover:text-slate-900">Sesi Supervisi</a>
+                @endcan
+                @can('notifikasi.manage')
+                    @livewire('notifikasi.badge')
+                @endcan
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="rounded-md bg-slate-800 px-3 py-1.5 text-white hover:bg-slate-700">

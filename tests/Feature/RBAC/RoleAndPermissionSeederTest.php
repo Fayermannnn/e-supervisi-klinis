@@ -30,6 +30,8 @@ class RoleAndPermissionSeederTest extends TestCase
 
         $this->assertTrue(Permission::where('name', 'sekolah.manage')->exists());
         $this->assertTrue(Permission::where('name', 'pengguna.manage')->exists());
+        $this->assertTrue(Permission::where('name', 'sesi-supervisi.manage')->exists());
+        $this->assertTrue(Permission::where('name', 'notifikasi.manage')->exists());
     }
 
     public function test_admin_dinas_can_manage_sekolah_and_pengguna(): void
@@ -52,12 +54,30 @@ class RoleAndPermissionSeederTest extends TestCase
         $this->assertFalse($role->hasPermissionTo('sekolah.manage'));
     }
 
-    public function test_guru_and_supervisor_have_no_management_permissions(): void
+    public function test_guru_and_supervisor_cannot_manage_sekolah_or_pengguna(): void
     {
         $this->seed(RoleAndPermissionSeeder::class);
 
-        $this->assertCount(0, Role::findByName('guru')->permissions);
-        $this->assertCount(0, Role::findByName('supervisor')->permissions);
+        $guru = Role::findByName('guru');
+        $supervisor = Role::findByName('supervisor');
+
+        $this->assertFalse($guru->hasPermissionTo('sekolah.manage'));
+        $this->assertFalse($guru->hasPermissionTo('pengguna.manage'));
+        $this->assertFalse($supervisor->hasPermissionTo('sekolah.manage'));
+        $this->assertFalse($supervisor->hasPermissionTo('pengguna.manage'));
+    }
+
+    public function test_guru_and_supervisor_can_reach_sesi_supervisi_and_notifikasi(): void
+    {
+        $this->seed(RoleAndPermissionSeeder::class);
+
+        $guru = Role::findByName('guru');
+        $supervisor = Role::findByName('supervisor');
+
+        $this->assertTrue($guru->hasPermissionTo('sesi-supervisi.manage'));
+        $this->assertTrue($guru->hasPermissionTo('notifikasi.manage'));
+        $this->assertTrue($supervisor->hasPermissionTo('sesi-supervisi.manage'));
+        $this->assertTrue($supervisor->hasPermissionTo('notifikasi.manage'));
     }
 
     public function test_seeder_is_idempotent(): void
@@ -66,6 +86,6 @@ class RoleAndPermissionSeederTest extends TestCase
         $this->seed(RoleAndPermissionSeeder::class);
 
         $this->assertSame(5, Role::count());
-        $this->assertSame(2, Permission::count());
+        $this->assertSame(4, Permission::count());
     }
 }
