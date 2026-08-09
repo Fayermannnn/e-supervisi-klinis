@@ -51,6 +51,18 @@
                                         class="ml-3 text-slate-600 hover:text-slate-900">Lihat Skor</a>
                                 @endif
                             @endcan
+                            @can('create', [\App\Models\UmpanBalik::class, $item])
+                                @if ($item->status === 'dianalisis')
+                                    <a href="{{ route('app.sesi-supervisi.umpan-balik', $item) }}"
+                                        class="ml-3 text-slate-600 hover:text-slate-900">Isi Umpan Balik</a>
+                                @endif
+                            @endcan
+                            @if ($item->umpanBalik)
+                                @can('refleksi', $item->umpanBalik)
+                                    <a href="{{ route('app.sesi-supervisi.refleksi', $item) }}"
+                                        class="ml-3 text-slate-600 hover:text-slate-900">Isi Refleksi</a>
+                                @endcan
+                            @endif
                         </td>
                     </tr>
                 @empty

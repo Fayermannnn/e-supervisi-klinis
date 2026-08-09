@@ -7,6 +7,7 @@ use App\Modules\Observasi\Http\Controllers\ObservasiController;
 use App\Modules\Pengguna\Http\Controllers\PenggunaController;
 use App\Modules\Perencanaan\Http\Controllers\SesiSupervisiController;
 use App\Modules\Sekolah\Http\Controllers\SekolahController;
+use App\Modules\UmpanBalik\Http\Controllers\UmpanBalikController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -29,6 +30,14 @@ Route::prefix('v1')->group(function () {
                 ->name('sesi-supervisi.observasi');
             Route::get('/sesi-supervisi/{sesi_supervisi}/skor', [AnalisisController::class, 'skor'])
                 ->name('sesi-supervisi.skor');
+            Route::post('/sesi-supervisi/{sesi_supervisi}/umpan-balik', [UmpanBalikController::class, 'store'])
+                ->name('sesi-supervisi.umpan-balik.store');
+            Route::get('/sesi-supervisi/{sesi_supervisi}/umpan-balik', [UmpanBalikController::class, 'show'])
+                ->name('sesi-supervisi.umpan-balik.show');
+            Route::patch('/sesi-supervisi/{sesi_supervisi}/umpan-balik/pendekatan', [UmpanBalikController::class, 'ubahPendekatan'])
+                ->name('sesi-supervisi.umpan-balik.pendekatan');
+            Route::patch('/sesi-supervisi/{sesi_supervisi}/umpan-balik/refleksi', [UmpanBalikController::class, 'isiRefleksi'])
+                ->name('sesi-supervisi.umpan-balik.refleksi');
         });
 
         Route::middleware('permission:instrumen.manage')->group(function () {

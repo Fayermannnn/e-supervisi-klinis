@@ -16,6 +16,8 @@ use App\Livewire\Perencanaan\PraObservasi;
 use App\Livewire\Sekolah\Create as SekolahCreate;
 use App\Livewire\Sekolah\Edit as SekolahEdit;
 use App\Livewire\Sekolah\Index as SekolahIndex;
+use App\Livewire\UmpanBalik\FormUmpanBalik;
+use App\Livewire\UmpanBalik\RefleksiGuru;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +59,8 @@ Route::middleware(['auth', 'permission:sesi-supervisi.manage'])->name('app.')->g
     Route::get('/sesi-supervisi/{sesiSupervisi}/pra-observasi', PraObservasi::class)->name('sesi-supervisi.pra-observasi');
     Route::get('/sesi-supervisi/{sesiSupervisi}/observasi', FormObservasi::class)->name('sesi-supervisi.observasi');
     Route::get('/sesi-supervisi/{sesiSupervisi}/skor', RingkasanSkor::class)->name('sesi-supervisi.skor');
+    Route::get('/sesi-supervisi/{sesiSupervisi}/umpan-balik', FormUmpanBalik::class)->name('sesi-supervisi.umpan-balik');
+    Route::get('/sesi-supervisi/{sesiSupervisi}/refleksi', RefleksiGuru::class)->name('sesi-supervisi.refleksi');
 });
 
 Route::middleware(['auth', 'permission:instrumen.manage'])->name('app.')->group(function () {

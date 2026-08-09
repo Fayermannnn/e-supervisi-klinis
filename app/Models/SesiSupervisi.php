@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SesiSupervisi extends Model
@@ -58,5 +59,10 @@ class SesiSupervisi extends Model
     public function hasilObservasi(): HasMany
     {
         return $this->hasMany(HasilObservasi::class, 'sesi_id');
+    }
+
+    public function umpanBalik(): HasOne
+    {
+        return $this->hasOne(UmpanBalik::class, 'sesi_id');
     }
 }

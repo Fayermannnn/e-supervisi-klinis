@@ -24,7 +24,7 @@ class SesiSupervisiService
         ?string $sekolahId = null,
     ): LengthAwarePaginator {
         return SesiSupervisi::query()
-            ->with(['guru', 'supervisor', 'sekolah'])
+            ->with(['guru', 'supervisor', 'sekolah', 'umpanBalik'])
             ->when($guruId, fn ($query) => $query->where('guru_id', $guruId))
             ->when($supervisorId, fn ($query) => $query->where('supervisor_id', $supervisorId))
             ->when($sekolahId, fn ($query) => $query->where('sekolah_id', $sekolahId))
